@@ -1,0 +1,49 @@
+package frc.robot.subsystems;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+public class armSubsystem extends PIDSubsystem {
+   
+    private SparkMax armMotor;
+    private DutyCycleEncder armEncoder;
+   
+    private final ArmFeedForward feedforward;
+    public class ArmSubsystem extends PIDSubsystem {
+    public ArmSubsystem() {
+        //TODO: Figure out this port
+        armMotor = new SparkMax(0, MotorType.kBrushless);
+        armEncoder = new DutyCycleEncder(0, 4.0, 2.0);
+                        //kP //kI //kD
+        new PIDController(0 , 0 , 0 ); //ks //kg //kv
+        feedforward = new ArmFeedforward(0 , 0 , 0 );
+    }
+
+    @Override
+    public double getMeasurement() {
+        double position = armEncoder.getPosition().getValueAsDouble();
+        double degrees = position * 360;
+        
+        return degrees - 0; //TODO: change zero to real offset
+    }
+
+    @Override 
+    public void useOutput(double output, double setpoint) {
+        double armEncoderVelocity =
+            armEncoder.getVelocity().getValueAsDouble() * 360;
+        double feedforwardOutput = feedforward.calculate(setpoint, armEncoderVelocity);
+        armMotor.set(output + feedforwardOutput);
+    }
+
+    @Override 
+    public void setSpeed(double speed){
+        armMotor.setSpeed(speed);
+    }
+
+    @Override 
+    public void stop(){
+        armMotor.stopMotor;
+    }
+
+    }
+}
+
